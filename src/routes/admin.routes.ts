@@ -1,0 +1,18 @@
+import { Router } from "express";
+import { Role } from "@prisma/client";
+import { requireAuth, requireRole } from "../middlewares/auth";
+import { adjustStock, auditLogs, cancelInvoice, createProduct, createUser, dashboard, listInvoices, listUsers, toggleProduct, toggleUser, updateProduct } from "../controllers/admin.controller";
+const router = Router();
+router.use(requireAuth, requireRole(Role.ADMIN));
+router.get("/dashboard", dashboard);
+router.get("/invoices", listInvoices);
+router.patch("/invoices/:id/cancel", cancelInvoice);
+router.post("/products", createProduct);
+router.patch("/products/:id", updateProduct);
+router.patch("/products/:id/toggle", toggleProduct);
+router.patch("/products/:id/stock", adjustStock);
+router.get("/users", listUsers);
+router.post("/users", createUser);
+router.patch("/users/:id/toggle", toggleUser);
+router.get("/audit-logs", auditLogs);
+export default router;

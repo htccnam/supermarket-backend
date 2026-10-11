@@ -1,0 +1,22 @@
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import { env } from "./config/env";
+import authRoutes from "./routes/auth.routes";
+import productRoutes from "./routes/product.routes";
+import invoiceRoutes from "./routes/invoice.routes";
+import adminRoutes from "./routes/admin.routes";
+import { errorHandler } from "./utils/errors";
+
+export const app = express();
+app.use(helmet());
+app.use(cors({ origin: env.FRONTEND_ORIGIN, credentials: true }));
+app.use(express.json());
+app.use(cookieParser());
+app.get("/health", (_req, res) => res.json({ status: "ok" }));
+app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/invoices", invoiceRoutes);
+app.use("/api/admin", adminRoutes);
+app.use(errorHandler);
