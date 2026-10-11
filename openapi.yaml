@@ -1,0 +1,71 @@
+openapi: 3.0.3
+info:
+  title: Supermarket API
+  version: 1.0.0
+  description: REST contract for the supermarket MVP.
+servers:
+  - url: http://localhost:3000
+paths:
+  /health:
+    get:
+      responses:
+        "200": { description: Service is healthy }
+  /api/auth/login:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200": { description: Authenticated; sets an HttpOnly cookie }
+        "401": { description: Invalid credentials }
+  /api/auth/logout:
+    post:
+      responses:
+        "204": { description: Cookie cleared }
+  /api/products:
+    get:
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { name: search, in: query, schema: { type: string } }
+      responses:
+        "200": { description: Active products }
+        "401": { description: Authentication required }
+  /api/invoices:
+    post:
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateInvoiceRequest"
+      responses:
+        "201": { description: Invoice created and stock decremented atomically }
+        "409": { description: Insufficient stock }
+components:
+  securitySchemes:
+    cookieAuth: { type: apiKey, in: cookie, name: token }
+  schemas:
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 1 }
+    CreateInvoiceRequest:
+      type: object
+      required: [paymentMethod, items]
+      properties:
+        paymentMethod: { type: string, enum: [CASH, CARD] }
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [productId, quantity]
+            properties:
+              productId: { type: string }
+              quantity: { type: integer, minimum: 1 }
