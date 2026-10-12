@@ -90,7 +90,12 @@ export async function adjustStock(req: AuthRequest, res: Response, next: NextFun
   try {
     const data = z.object({ quantity: z.number().int(), reason: z.string().min(3) }).parse(req.body);
     const product = await prisma.$transaction(async (tx) => {
-      const updated = await tx.product.update({ where: { id: String(req.params.id) }, data: { stock: { increment: data.quantity } } });
+      const updatedCount = await tx.product.updateMany({
+        where: { id: String(req.params.id), stock: { gte: Math.max(-data.quantity, 0) } },
+        data: { stock: { increment: data.quantity } }
+      });
+      if (!updatedCount.count) throw new AppError(409, "Stock cannot become negative or product was not found");
+      const updated = await tx.product.findUniqueOrThrow({ where: { id: String(req.params.id) } });
       await tx.inventoryMovement.create({ data: { productId: updated.id, type: "ADJUSTMENT", quantity: data.quantity, reason: data.reason } });
       return updated;
     });
