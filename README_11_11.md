@@ -7,3 +7,8 @@
 - Bổ sung dashboard doanh thu, sản phẩm bán chạy, tồn kho thấp và audit log.
 - Đã chạy `npm test` với Vitest cho đăng nhập và service tạo hóa đơn: credential không hợp lệ, số lượng không dương và bán vượt tồn.
 - Đã chạy `npm run build` để kiểm tra TypeScript compile.
+
+## Lead mindset và kiểm soát mã nguồn
+- `git log --oneline --stat`: kiểm tra commit có mục tiêu rõ ràng, phạm vi thay đổi và tiến độ theo thời gian.
+- `git diff --check`: phát hiện whitespace lỗi trước khi commit; `git diff --cached` dùng để review đúng phần chuẩn bị commit.
+- Tiêu chí thành viên hiệu quả: commit nhỏ, mô tả đúng nội dung, thay đổi có liên quan, có test/build làm bằng chứng và không để thay đổi chưa giải thích trong worktree.
