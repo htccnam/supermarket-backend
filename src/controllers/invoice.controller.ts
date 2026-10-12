@@ -6,7 +6,10 @@ import { AuthRequest } from "../middlewares/auth";
 import { createInvoice } from "../services/invoice.service";
 const input = z.object({ paymentMethod: z.nativeEnum(PaymentMethod), items: z.array(z.object({ productId: z.string(), quantity: z.number().int().positive() })).min(1) });
 export async function postInvoice(req: AuthRequest, res: Response, next: NextFunction) {
-  try { res.status(201).json(await createInvoice(req.user!.id, input.parse(req.body).items, input.parse(req.body).paymentMethod)); } catch (error) { next(error); }
+  try {
+    const data = input.parse(req.body);
+    res.status(201).json(await createInvoice(req.user!.id, data.items, data.paymentMethod));
+  } catch (error) { next(error); }
 }
 export async function listMyInvoices(req: AuthRequest, res: Response, next: NextFunction) {
   try {
